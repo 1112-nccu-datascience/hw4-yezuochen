@@ -8,13 +8,15 @@ library(magrittr)
 
 ## UI ####
 ui <- fluidPage(
-  titlePanel("1112DS-hw4 社四葉佐晨 108204045"),
+  titlePanel("NCCU1112DS-hw4 社四葉佐晨 108204045"),
   tabsetPanel(
     tabPanel("IRIS",
         navlistPanel(
           tabPanel("Data", 
+                   h3("IRIS Row Data"),
                    tableOutput("data")),
           tabPanel("Summary",
+                   h3("Descriptive Statistics of IRIS Data"),
                    verbatimTextOutput("summary"))
         )),
      tabPanel("PCA",
@@ -26,6 +28,7 @@ ui <- fluidPage(
                       choices = c("PC1" = 1, "PC2" = 2, "PC3" = 3, "PC4" = 4))
         ),
         mainPanel(
+          h3("PCA Plot"),
           plotOutput(outputId = "pcaPlot")
         )
       ),
@@ -36,6 +39,7 @@ ui <- fluidPage(
                                    "CA BiPlot" = "biplot"))
           ),
         mainPanel(
+          h3("CA Plot"),
           plotOutput(outputId = "caPlot")
         )),
     tabPanel("Kmeans",
@@ -43,6 +47,7 @@ ui <- fluidPage(
                sliderInput(inputId = "k", "Cluster", 1, 10, 3)
              ),
              mainPanel(
+               h3("Kmeans Cluster Plot"),
                plotOutput(outputId = "kmeansPlot")
              ))
       )
@@ -51,20 +56,20 @@ ui <- fluidPage(
 ## Server ######
 server <- function(input, output){
   
+  data(iris)
+  
+  output$data <- renderTable(iris)
+  
+  output$summary <- renderPrint({
+    summary(iris, digit = 3)
+  })
   
   output$pcaPlot <- renderPlot({
     
     PCs <- as.numeric(c(input$xaxis, input$yaxis))
     
-    data(iris)
-    
-    output$data <- renderTable(iris)
-    
-    output$summary <- renderPrint({
-      summary(iris, digit = 3)
-    })
 
-    
+
     log.ir <- log(iris[,1:4])
     ir.species <- iris[,5]
     
@@ -77,7 +82,6 @@ server <- function(input, output){
     
   })
   output$caPlot <- renderPlot({
-    data(iris)
     
     if (input$pltType == "factor map"){
       CA(iris, quali.sup = 5) %>% 
@@ -91,8 +95,6 @@ server <- function(input, output){
   })
 
   output$kmeansPlot <- renderPlot({
-    
-    data(iris)
     
     iris.ca <- CA(iris[-5], graph = FALSE)
     
