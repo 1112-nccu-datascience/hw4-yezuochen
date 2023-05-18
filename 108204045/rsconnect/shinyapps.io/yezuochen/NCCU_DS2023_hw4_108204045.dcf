@@ -5,9 +5,9 @@ account: yezuochen
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9084197
-bundleId: 7202338
+bundleId: 7233992
 url: https://yezuochen.shinyapps.io/NCCU_DS2023_hw4_108204045/
-when: 1683774361.54829
-lastSyncTime: 1683774361.5483
+when: 1684417928.08449
+lastSyncTime: 1684417928.08451
 asMultiple: FALSE
 asStatic: FALSE

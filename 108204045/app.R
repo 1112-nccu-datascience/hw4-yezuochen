@@ -6,16 +6,23 @@ library(factoextra)
 library(FactoMineR)
 library(magrittr)
 
-## PCA Plot ####
+## UI ####
 ui <- fluidPage(
-  titlePanel("葉佐晨的HW4-108204045"),
+  titlePanel("1112DS-hw4 社四葉佐晨 108204045"),
   tabsetPanel(
+    tabPanel("IRIS",
+        navlistPanel(
+          tabPanel("Data", 
+                   tableOutput("data")),
+          tabPanel("Summary",
+                   verbatimTextOutput("summary"))
+        )),
      tabPanel("PCA",
         sidebarPanel(
           selectInput(inputId = "xaxis", label = "X axis",
                       choices = c("PC1" = 1, "PC2" = 2, "PC3" = 3, "PC4" = 4)),
           
-          selectInput(inputId = "yaxis", label = "Y axis",
+          selectInput(inputId = "yaxis", label = "Y axis", selected = 2,
                       choices = c("PC1" = 1, "PC2" = 2, "PC3" = 3, "PC4" = 4))
         ),
         mainPanel(
@@ -30,11 +37,18 @@ ui <- fluidPage(
           ),
         mainPanel(
           plotOutput(outputId = "caPlot")
-        ))
+        )),
+    tabPanel("Kmeans",
+             sidebarPanel(
+               sliderInput(inputId = "k", "Cluster", 1, 10, 3)
+             ),
+             mainPanel(
+               plotOutput(outputId = "kmeansPlot")
+             ))
       )
 )
 
-
+## Server ######
 server <- function(input, output){
   
   
@@ -43,6 +57,13 @@ server <- function(input, output){
     PCs <- as.numeric(c(input$xaxis, input$yaxis))
     
     data(iris)
+    
+    output$data <- renderTable(iris)
+    
+    output$summary <- renderPrint({
+      summary(iris, digit = 3)
+    })
+
     
     log.ir <- log(iris[,1:4])
     ir.species <- iris[,5]
@@ -68,11 +89,25 @@ server <- function(input, output){
     }
     
   })
+
+  output$kmeansPlot <- renderPlot({
+    
+    data(iris)
+    
+    iris.ca <- CA(iris[-5], graph = FALSE)
+    
+    iris.ca.coord <- iris.ca$row$coord[, c(1,2)]
+    
+    clusters <- kmeans(iris.ca.coord, input$k)
+    
+    plot(iris.ca.coord, col = clusters$cluster, 
+         main = "Kmeans Plot with CA")
+    points(clusters$centers, pch = 2, lwd = 2, cex = 2)
+  })
 }
 
+# Run App #####
 shinyApp(ui = ui, server = server)
-
-## CA Plot ####
 
 
 
